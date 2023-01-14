@@ -8,10 +8,20 @@
   roles:
     - role: nginxinc.nginx
     - role: geerlingguy.docker
-  post_tasks:
+  pre_tasks:
+    - name: Install chronyd
+      ansible.builtin.apt:
+        name: chrony
+        state: present
+    - name: Enable chronyd
+      ansible.builtin.systemd:
+        name: chrony
+        enabled: true
+        state: started
     - name: Configure timezone
       community.general.system.timezone:
         name: Europe/Moscow
+  post_tasks:
     - name: Append SSH key
       ansible.posix.authorized_key:
         user: vagrant
