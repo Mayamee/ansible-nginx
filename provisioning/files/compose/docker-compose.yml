@@ -1,0 +1,19 @@
+version: '3.5'
+services:
+  grafana:
+    user: 0:0
+    image: grafana/grafana:latest
+    container_name: grafana
+    restart: unless-stopped
+    ports:
+      - 3000:3000
+    volumes:
+      - /etc/localtime:/etc/localtime:ro
+      - /opt/docker/grafana:/var/lib/grafana:rw
+    environment:
+      - GF_SERVER_PROTOCOL=http
+      - GF_SECURITY_ADMIN_PASSWORD=password
+      - GF_SECURITY_ALLOW_EMBEDDING=true
+      - GF_INSTALL_PLUGINS=grafana-clock-panel,grafana-simple-json-datasource
+      - GF_AUTH_BASIC_ENABLED=false
+      - GF_USERS_ALLOW_SIGN_UP=false

@@ -1,15 +1,50 @@
+---
 - name: Provision VM
   hosts: all
   become: true
   vars_files:
     - vars/nginx.yml
+    - vars/docker.yml
   roles:
     - role: nginxinc.nginx
-      vars:
-        state: present
-  tasks:
+    - role: geerlingguy.docker
+  post_tasks:
+    - name: Configure timezone
+      community.general.system.timezone:
+        name: Europe/Moscow
     - name: Append SSH key
       ansible.posix.authorized_key:
         user: vagrant
         key: "{{ lookup('file', 'files/id_rsa.pub') }}"
         state: present
+  tasks:
+    - name: Create docker compose stash folder
+      ansible.builtin.file:
+        path: /home/vagrant/compose
+        state: directory
+        owner: vagrant
+        group: vagrant
+        mode: 0755
+    - name: Copy docker compose file
+      ansible.builtin.copy:
+        src: files/compose/docker-compose.yml
+        dest: /home/vagrant/compose/docker-compose.yml
+        owner: vagrant
+        group: vagrant
+        mode: 0644
+    - name: Launch docker compose
+      ansible.builtin.command: "{{ item }}"
+      args:
+        chdir: /home/vagrant/compose
+      loop:
+        - docker-compose down
+        - docker-compose up -d --force-recreate
+      changed_when: false
+    - name: Apply nginx config
+      ansible.builtin.template:
+        src: templates/nginx.conf.j2
+        dest: /etc/nginx/nginx.conf
+        owner: root
+        group: root
+        mode: 0644
+      notify: (Handler) Start/reload NGINX
