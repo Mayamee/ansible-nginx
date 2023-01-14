@@ -5,6 +5,8 @@
     - vars/nginx.yml
   roles:
     - role: nginxinc.nginx
+      vars:
+        state: present
   tasks:
     - name: Append SSH key
       ansible.posix.authorized_key:
