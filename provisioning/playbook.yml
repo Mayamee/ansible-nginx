@@ -1,0 +1,13 @@
+- name: Provision VM
+  hosts: all
+  become: true
+  vars_files:
+    - vars/nginx.yml
+  roles:
+    - role: nginxinc.nginx
+  tasks:
+    - name: Append SSH key
+      ansible.posix.authorized_key:
+        user: vagrant
+        key: "{{ lookup('file', 'files/id_rsa.pub') }}"
+        state: present

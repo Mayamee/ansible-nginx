@@ -1,1 +1,2 @@
-# ansible-nginx
+# nginx-lab
+learn nginx
