@@ -37,18 +37,15 @@
         mode: 0755
     - name: Copy docker compose file
       ansible.builtin.copy:
-        src: files/compose/docker-compose.yml
+        src: files/docker/docker-compose.yml
         dest: /home/vagrant/compose/docker-compose.yml
         owner: vagrant
         group: vagrant
         mode: 0644
     - name: Launch docker compose
-      ansible.builtin.command: "{{ item }}"
+      ansible.builtin.shell: docker-compose down && docker-compose up -d
       args:
         chdir: /home/vagrant/compose
-      loop:
-        - docker-compose down
-        - docker-compose up -d --force-recreate
       changed_when: false
     - name: Apply nginx config
       ansible.builtin.template:
